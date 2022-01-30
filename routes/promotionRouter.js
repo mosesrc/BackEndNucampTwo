@@ -1,53 +1,94 @@
-const express = require("express");
+const express = require('express');
+const Promotion = require('../models/promotion');
+
 const promotionRouter = express.Router();
 
 promotionRouter
-  .route("/")
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain"); // we are going to sen back plain text in the response body
-    next(); //Past control of the app routing to the next relevant routing method after this one
+  .route('/')
+  .get((req, res, next) => {
+    Promotion.find()
+      .then((promotions) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json'); // we are going to sen back plain text in the response body
+        res.json(promotions);
+      })
+      .catch((err) => next(err));
   })
-  .get((req, res) => {
-    res.end("Will send all the promotions to you");
-  })
-  .post((req, res) => {
-    res.end(
-      `Will add the promotions: ${req.body.name} with description: ${req.body.description}`
-    );
+  .post((req, res, next) => {
+    Promotion.create(req.body)
+      .then((promotion) => {
+        console.log('Promotion Created', promotion);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json'); // we are going to sen back plain text in the response body
+        res.json(promotion);
+      })
+      .catch((err) => next(err));
   })
   .put((req, res) => {
     res.statusCode = 403;
-    res.end("PUT operation not supported on /promotions");
+    res.end('PUT operation not supported on /promotions');
   })
-  .delete((req, res) => {
-    res.end("Deleting all promotions");
+  .delete((req, res, next) => {
+    Promotion.deleteMany()
+      .then((response) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json'); // we are going to sen back plain text in the response body
+        res.json(response);
+      })
+      .catch((err) => next(err));
   });
 
 promotionRouter
-  .route("/:promotionId")
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain"); // we are going to sen back plain text in the response body
-    next(); //Past control of the app routing to the next relevant routing method after this one
+  .route('/:promotionId')
+  .get((req, res, next) => {
+    Promotion.findById(req.params.promotionId)
+      .then((promotion) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json'); // we are going to sen back plain text in the response body
+        res.json(promotion);
+      })
+      .catch((err) => next(err));
   })
-  .get((req, res) => {
-    res.end("Will send all the promotions to you");
-  })
-  .post((req, res) => {
+  .post((req, res, next) => {
     res.statusCode = 403;
     res.end(
       `POST operation not supported on /promotions/${req.params.promotionId}`
     );
   })
-  .put((req, res) => {
-    res.write(`Updating the promotion: ${req.params.promotionId}\n`);
-    res.end(
-      `Will update the promotion: ${req.body.name} with description: ${req.body.description}`
-    );
+  .put((req, res, next) => {
+    Promotion.findById(req.params.promotionId)
+      .then((promotion) => {
+        if (promotion) {
+          if (req.body.name) {
+            promotion.name = req.body.name;
+          }
+          if (req.body.cost) {
+            promotion.cost = req.body.cost;
+          }
+          if (req.body.description) {
+            promotion.description = req.body.description;
+          }
+          promotion.save().then((partner) => {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json'); // we are going to sen back plain text in the response body
+            res.json(promotion);
+          });
+        } else if (!promotion) {
+          err = new Error(` Partner {$req.params.promotionId} not found`);
+          err.status = 404;
+          return next(err); //passes off error to the express error handling system
+        }
+      })
+      .catch((err) => next(err));
   })
-  .delete((req, res) => {
-    res.end("Deleting all promotions");
+  .delete((req, res, next) => {
+    Promotion.findByIdAndDelete(req.params.promotionId)
+      .then((response) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json'); // we are going to sen back plain text in the response body
+        res.json(response);
+      })
+      .catch((err) => next(err));
   });
 
 module.exports = promotionRouter;

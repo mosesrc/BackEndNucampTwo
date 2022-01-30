@@ -1,4 +1,3 @@
-const { application } = require('express');
 const express = require('express');
 const Campsite = require('../models/campsite');
 
@@ -62,7 +61,7 @@ campsiteRouter
       {
         $set: req.body,
       },
-      { new: true }
+      { new: true } // returns document after update is applied
     )
       .then((campsite) => {
         res.statusCode = 200;
