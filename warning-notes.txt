@@ -1,0 +1,11 @@
+npm WARN mongoose-currency@0.2.0 requires a peer of mongoose@~> 4.x but none is installed. You must install peer dependencies yourself.
+
++ mongoose@5.10.9
++ mongoose-currency@0.2.0
+added 29 packages from 19 contributors and audited 130 packages in 4.973s
+
+2 packages are looking for funding
+  run `npm fund` for details
+
+found 6 vulnerabilities (1 low, 1 moderate, 1 high, 3 critical)
+  run `npm audit fix` to fix them, or `npm audit` for details
