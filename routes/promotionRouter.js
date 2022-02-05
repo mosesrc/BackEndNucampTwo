@@ -56,28 +56,17 @@ promotionRouter
     );
   })
   .put((req, res, next) => {
-    Promotion.findById(req.params.promotionId)
-      .then((promotion) => {
-        if (promotion) {
-          if (req.body.name) {
-            promotion.name = req.body.name;
-          }
-          if (req.body.cost) {
-            promotion.cost = req.body.cost;
-          }
-          if (req.body.description) {
-            promotion.description = req.body.description;
-          }
-          promotion.save().then((partner) => {
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json'); // we are going to sen back plain text in the response body
-            res.json(promotion);
-          });
-        } else if (!promotion) {
-          err = new Error(` Partner {$req.params.promotionId} not found`);
-          err.status = 404;
-          return next(err); //passes off error to the express error handling system
-        }
+    Promotion.findByIdAndUpdate(
+      req.params.promotionId,
+      {
+        $set: req.body,
+      },
+      { new: true }
+    )
+      .then((response) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(response);
       })
       .catch((err) => next(err));
   })
