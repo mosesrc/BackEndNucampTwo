@@ -5,13 +5,22 @@ const passport = require('passport');
 const authenticate = require('../authenticate');
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.send('respond with a resource');
+// Check if user is an admin
+router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function (req, res, next) {
+  User.find() // find all users and then return them back in response
+    .then((users) => {
+      res.status = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json(users);
+    })
+    .catch((err) => next(err));
+
+  // res.send('respond with a resource');  Add authentication and use user model to return all users
 });
 
 router.post('/signup', (req, res) => {
   User.register(
-    new User({ username: req.body.username }),
+    new User({ username: req.body.username }), // passport is handling
     req.body.password,
     (err, user) => {
       if (err) {

@@ -7,7 +7,7 @@ const userSchema = new Schema({
     type: String,
     default: '',
   },
-  Lastname: {
+  lastname: {
     type: String,
     default: '',
   },
@@ -17,6 +17,6 @@ const userSchema = new Schema({
   },
 });
 
-userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose); // Passport is handling the username and password
 
 module.exports = mongoose.model('User', userSchema);
